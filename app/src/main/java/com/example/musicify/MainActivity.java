@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
         if (songCursor != null && songCursor.moveToFirst()){
             int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            MediaStore.Audio.Media.
             int isSong = songCursor.getColumnIndex(MediaStore.Audio.Media.IS_MUSIC);
             do {
                 String currentTitle = songCursor.getString(songTitle);
