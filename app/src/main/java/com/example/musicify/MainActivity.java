@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.ContentResolver;
@@ -13,16 +15,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.Editable;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
     //Modify this function in the future for Recycler View
     public void fetch_songs(){
         ArrayList<Song> songs = getMusic();
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new MyAdapter(getApplicationContext(), songs));
     }
 
     public ArrayList<Song> getMusic(){
@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }while (songCursor.moveToNext());
+            songCursor.close();
         }
         return songs;
     }
