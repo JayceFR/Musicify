@@ -44,35 +44,33 @@ public class MainActivity extends AppCompatActivity {
     }
     //Modify this function in the future for Recycler View
     public void fetch_songs(){
-        ArrayList<String> songs = getMusic();
-        song_text.setText("Hello world");
+        ArrayList<Song> songs = getMusic();
+        song_text.setText("Hello world found around " + Integer.valueOf(songs.size()));
     }
 
-    public ArrayList<String> getMusic(){
+    public ArrayList<Song> getMusic(){
         ContentResolver contentResolver = getContentResolver();
         Uri songURI = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor songCursor = contentResolver.query(songURI, null, null, null,null);
-        ArrayList<String> songs = new ArrayList<String>();
+        ArrayList<Song> songs = new ArrayList<Song>();
         if (songCursor != null && songCursor.moveToFirst()){
             int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
+            int songData = songCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
             int isSong = songCursor.getColumnIndex(MediaStore.Audio.Media.IS_MUSIC);
             do {
                 String currentTitle = songCursor.getString(songTitle);
                 String currentArtist = songCursor.getString(songArtist);
                 int is_current_music = songCursor.getInt(isSong);
+                String path = songCursor.getString(songData);
+                int duration = songCursor.getInt(songDuration);
                 if (is_current_music == 1){
-                    Log.i(Tag, currentTitle + is_current_music);
-                    songs.add(currentTitle + currentArtist);
+                    Log.i(Tag, currentTitle + duration);
+                    songs.add(new Song(currentTitle, currentArtist, duration, path));
                 }
 
             }while (songCursor.moveToNext());
-            /*do {
-                String currentTitle = songCursor.getString(songTitle);
-                String currentArtist = songCursor.getString(songArtist);
-                Log.i(Tag, currentTitle);
-                songs.add(currentTitle + currentArtist);
-            } while (songCursor.moveToFirst());*/
         }
         return songs;
     }
