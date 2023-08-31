@@ -16,10 +16,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.animation.OvershootInterpolator;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,7 +50,12 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Song> songs = getMusic();
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new MyAdapter(getApplicationContext(), songs));
+        MyAdapter songAdapter = new MyAdapter(getApplicationContext(), songs);
+        ScaleInAnimationAdapter scaleInAnimationAdapter = new ScaleInAnimationAdapter(songAdapter);
+        scaleInAnimationAdapter.setDuration(1000);
+        scaleInAnimationAdapter.setInterpolator(new OvershootInterpolator());
+        scaleInAnimationAdapter.setFirstOnly(false);
+        recyclerView.setAdapter(scaleInAnimationAdapter);
     }
 
     public ArrayList<Song> getMusic(){

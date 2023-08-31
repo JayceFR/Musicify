@@ -36,6 +36,7 @@ dependencies {
     //For Recycler View
     implementation("androidx.recyclerview:recyclerview:1.3.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("jp.wasabeef:recyclerview-animators:4.0.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
