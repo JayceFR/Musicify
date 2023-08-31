@@ -2,24 +2,33 @@ package com.example.musicify;
 
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
+import android.media.browse.MediaBrowser;
+import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.MediaMetadata;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
     Context context;
     List<Song> songs;
+    ExoPlayer player;
 
-    public MyAdapter(Context context, List<Song> songs) {
+    public MyAdapter(Context context, List<Song> songs, ExoPlayer player) {
         this.context = context;
         this.songs = songs;
+        this.player = player;
     }
 
     @NonNull
@@ -42,6 +51,33 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
                     load(R.drawable.headphone_pic).
                     into(holder.imageView);
         }
+        holder.songView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!player.isPlaying()){
+                    player.setMediaItems(getMediaItems(), position, 0);
+                }
+                else{
+                    player.pause();
+                    player.seekTo(position, 0);
+                }
+                player.prepare();
+                player.play();
+            }
+        });
+    }
+
+    public List<MediaItem> getMediaItems(){
+        List<MediaItem> mediaItems = new ArrayList<>();
+        for (Song song : songs){
+            MediaItem mediaItem = new MediaItem.Builder().setUri(song.getPath()).setMediaMetadata(getMetaData(song)).build();
+            mediaItems.add(mediaItem);
+        }
+        return mediaItems;
+    }
+
+    public MediaMetadata getMetaData(Song song){
+        return new MediaMetadata.Builder().setTitle(song.getTitle()).setArtworkUri(Uri.parse(song.getPath())).build();
     }
 
     @Override

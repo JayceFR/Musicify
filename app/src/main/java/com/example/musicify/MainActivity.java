@@ -1,8 +1,10 @@
 package com.example.musicify;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,7 +20,14 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.animation.OvershootInterpolator;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.Player;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -28,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
     public EditText song_text;
     private static final String Tag = "MainActivity";
+    public ExoPlayer player;
+    ConstraintLayout miniPlayer;
+    TextView homeSongNameView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,13 +56,36 @@ public class MainActivity extends AppCompatActivity {
         else{
             fetch_songs();
         }
+        player = new ExoPlayer.Builder(this).build();
+        homeSongNameView = findViewById(R.id.homeSongNameView);
+        playwerControls();
+    }
+    public void playwerControls(){
+        homeSongNameView.setSelected(true);
+        player.addListener(new Player.Listener() {
+            @Override
+            public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
+                //Display title of the song
+                assert mediaItem != null;
+                Log.i(Tag, "Here I am ");
+                Log.i(Tag, (String) mediaItem.mediaMetadata.title);
+                homeSongNameView.setText(mediaItem.mediaMetadata.title);
+                Player.Listener.super.onMediaItemTransition(mediaItem, reason);
+
+            }
+
+            @Override
+            public void onPlaybackStateChanged(int playbackState) {
+                Player.Listener.super.onPlaybackStateChanged(playbackState);
+            }
+        });
     }
     //Modify this function in the future for Recycler View
     public void fetch_songs(){
         ArrayList<Song> songs = getMusic();
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        MyAdapter songAdapter = new MyAdapter(getApplicationContext(), songs);
+        MyAdapter songAdapter = new MyAdapter(getApplicationContext(), songs, player);
         ScaleInAnimationAdapter scaleInAnimationAdapter = new ScaleInAnimationAdapter(songAdapter);
         scaleInAnimationAdapter.setDuration(1000);
         scaleInAnimationAdapter.setInterpolator(new OvershootInterpolator());
@@ -84,6 +119,15 @@ public class MainActivity extends AppCompatActivity {
             songCursor.close();
         }
         return songs;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (player.isPlaying()){
+            player.stop();
+        }
+        player.release();
     }
 
     @Override
