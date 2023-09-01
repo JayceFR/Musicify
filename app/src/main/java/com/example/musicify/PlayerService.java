@@ -56,6 +56,7 @@ public class PlayerService extends Service {
         player = new ExoPlayer.Builder(getApplicationContext()).build();
         AudioAttributes audioAttributes = new AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_MUSIC).build();
         player.setAudioAttributes(audioAttributes, true);
+        player.setHandleAudioBecomingNoisy(true);
 
         final String channelID = getResources().getString(R.string.app_name);
         final int notificationId = 1111111;
