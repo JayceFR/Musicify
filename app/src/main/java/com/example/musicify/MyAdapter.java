@@ -1,12 +1,14 @@
 package com.example.musicify;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaMetadataRetriever;
 import android.media.browse.MediaBrowser;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,20 +53,32 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
                     load(R.drawable.headphone_pic).
                     into(holder.imageView);
         }
-        holder.songView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!player.isPlaying()){
-                    player.setMediaItems(getMediaItems(), position, 0);
-                }
-                else{
-                    player.pause();
-                    player.seekTo(position, 0);
-                }
-                player.prepare();
-                player.play();
+        holder.songView.setOnClickListener(view -> {
+            context.startService(new Intent(context.getApplicationContext(), PlayerService.class));
+            if (!player.isPlaying()){
+                player.setMediaItems(getMediaItems(), position, 0);
             }
+            else{
+                player.pause();
+                player.seekTo(position,0);
+            }
+            player.prepare();
+            player.play();
         });
+//        holder.songView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(!player.isPlaying()){
+//                    player.setMediaItems(getMediaItems(), position, 0);
+//                }
+//                else{
+//                    player.pause();
+//                    player.seekTo(position, 0);
+//                }
+//                player.prepare();
+//                player.play();
+//            }
+//        });
     }
 
     public List<MediaItem> getMediaItems(){

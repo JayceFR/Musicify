@@ -11,12 +11,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -49,10 +54,27 @@ public class MainActivity extends AppCompatActivity {
     TextView playpausebtn, skipNextBtn, skipPrevBtn, repeatBtn, shuffleBtn;
     int repeatMode = 1; //repeat all = 1, repeat one = 2,
     int shuffleMode = 1;
+    boolean is_bound = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //player = new ExoPlayer.Builder(this).build();
+        homeSongNameView = findViewById(R.id.homeSongNameView);
+        miniPlayer = findViewById(R.id.miniPlayer);
+        seekBar = findViewById(R.id.seekbar);
+        playpausebtn = findViewById(R.id.homePlayPauseBtn);
+        skipNextBtn = findViewById(R.id.skipNextBtn);
+        skipPrevBtn = findViewById(R.id.skipPrevBtn);
+        repeatBtn = findViewById(R.id.repeat_btn);
+        shuffleBtn = findViewById(R.id.shuffle_btn);
+        //playwerControls();
+        //bind to the player service
+        doBindService();
+    }
+
+    public void requestPermission(){
         Log.i(Tag, String.valueOf(AppCompatDelegate.getDefaultNightMode()));
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED){
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_MEDIA_AUDIO)){
@@ -65,17 +87,31 @@ public class MainActivity extends AppCompatActivity {
         else{
             fetch_songs();
         }
-        player = new ExoPlayer.Builder(this).build();
-        homeSongNameView = findViewById(R.id.homeSongNameView);
-        miniPlayer = findViewById(R.id.miniPlayer);
-        seekBar = findViewById(R.id.seekbar);
-        playpausebtn = findViewById(R.id.homePlayPauseBtn);
-        skipNextBtn = findViewById(R.id.skipNextBtn);
-        skipPrevBtn = findViewById(R.id.skipPrevBtn);
-        repeatBtn = findViewById(R.id.repeat_btn);
-        shuffleBtn = findViewById(R.id.shuffle_btn);
-        playwerControls();
     }
+
+    public void doBindService(){
+        Intent playerServiceIntent = new Intent(this, PlayerService.class);
+        bindService(playerServiceIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    ServiceConnection playerServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            //get the service instance
+            PlayerService.ServiceBinder binder = (PlayerService.ServiceBinder) iBinder;
+            player = binder.getPlayerService().player;
+            is_bound = true;
+            requestPermission();
+            //ready to show the songs
+            playwerControls();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
+
     public void playwerControls(){
         homeSongNameView.setSelected(true);
         player.addListener(new Player.Listener() {
@@ -264,11 +300,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        doUnbindService();
+        stopService(new Intent(this, PlayerService.class));
         super.onDestroy();
-        if (player.isPlaying()){
-            player.stop();
+//        if (player.isPlaying()){
+//            player.stop();
+//        }
+//        player.release();
+
+    }
+
+    public void doUnbindService(){
+        if (is_bound){
+            Log.i(Tag, "I am here to clap you ");
+            unbindService(playerServiceConnection);
+            is_bound = false;
         }
-        player.release();
     }
 
     @Override
