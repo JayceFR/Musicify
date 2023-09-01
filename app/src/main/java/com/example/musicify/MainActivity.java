@@ -26,6 +26,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.data.ExifOrientationStream;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
@@ -45,7 +46,9 @@ public class MainActivity extends AppCompatActivity {
     ConstraintLayout miniPlayer;
     TextView homeSongNameView;
     SeekBar seekBar;
-    TextView playpausebtn, skipNextBtn, skipPrevBtn;
+    TextView playpausebtn, skipNextBtn, skipPrevBtn, repeatBtn, shuffleBtn;
+    int repeatMode = 1; //repeat all = 1, repeat one = 2,
+    int shuffleMode = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
         playpausebtn = findViewById(R.id.homePlayPauseBtn);
         skipNextBtn = findViewById(R.id.skipNextBtn);
         skipPrevBtn = findViewById(R.id.skipPrevBtn);
+        repeatBtn = findViewById(R.id.repeat_btn);
+        shuffleBtn = findViewById(R.id.shuffle_btn);
         playwerControls();
     }
     public void playwerControls(){
@@ -167,6 +172,39 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        repeatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (repeatMode == 1){
+                    player.setRepeatMode(ExoPlayer.REPEAT_MODE_ONE);
+                    repeatMode = 2;
+                    repeatBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_on, 0, 0,0);
+                }
+                else if (repeatMode == 2){
+                    player.setRepeatMode(ExoPlayer.REPEAT_MODE_ALL);
+                    repeatMode = 1;
+                    repeatBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_repeat_off, 0, 0,0 );
+                }
+            }
+        });
+
+        shuffleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (shuffleMode == 1){
+                    player.setShuffleModeEnabled(true);
+                    shuffleBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shuffle_on, 0, 0,0);
+                    shuffleMode = 2;
+                } else if (shuffleMode == 2) {
+                    player.setShuffleModeEnabled(false);
+                    shuffleBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shuffle_off, 0,0,0);
+                    shuffleMode = 1;
+                }
+
+            }
+        });
+
 
     }
 

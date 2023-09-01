@@ -13,10 +13,31 @@
         android:layout_height="wrap_content"
         android:textSize="26dp"
         android:text="Musicify"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:marqueeRepeatLimit="marquee_forever"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/repeat_btn"
+        android:layout_width="41dp"
+        android:layout_height="39dp"
+        app:drawableStartCompat="@drawable/ic_repeat_off"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.539"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/shuffle_btn"
+        android:layout_width="41dp"
+        android:layout_height="39dp"
+        app:drawableStartCompat="@drawable/ic_shuffle_off"
+        app:layout_constraintEnd_toStartOf="@+id/textView2"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
