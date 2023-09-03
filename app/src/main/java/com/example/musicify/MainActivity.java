@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         else{
+            initialize();
             fetch_songs();
         }
     }
@@ -257,6 +258,18 @@ public class MainActivity extends AppCompatActivity {
         }, 1000);
     }
 
+    public void initialize(){
+        Playlists all_song_playlist = new Playlists("All Songs");
+        all_song_playlist.setSongs(getMusic());
+        ArrayList<Playlists> playlists = new ArrayList<Playlists>();
+        playlists.add(all_song_playlist);
+        RecyclerView recyclerView = findViewById(R.id.playlist_recylerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        PlayListAdapter playListAdapter = new PlayListAdapter(getApplicationContext(), playlists);
+        recyclerView.setAdapter(playListAdapter);
+    }
+
+
     //Modify this function in the future for Recycler View
     public void fetch_songs(){
         ArrayList<Song> songs = getMusic();
@@ -325,6 +338,7 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(this, "Permission Granted! Enjoy Listening", Toast.LENGTH_SHORT).show();
+                        initialize();
                         fetch_songs();
                     }
                 } else {
