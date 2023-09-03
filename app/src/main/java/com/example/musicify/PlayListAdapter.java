@@ -50,12 +50,15 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
         holder.playlist_menu_btn.setImageResource(R.drawable.ic_trash);
         Log.i("TEST", String.valueOf(playlists.get(position).getIs_selected()));
         holder.playlist_view.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 if (!playlists.get(position).getIs_selected()){
+                    reset_rest();
                     Log.i("TEST", "selected is true");
                     holder.selected_line.setBackgroundColor(Color.parseColor("#ffffff"));
                     playlists.get(position).setIs_selected(true);
+                    playlists.get(position).setHolder(holder);
                     //get all the songs
                     fetch_songs(context, player, recyclerView, playlists.get(position).getSongs());
                 }
@@ -65,6 +68,16 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
                 }
             }
         });
+    }
+
+    public void reset_rest(){
+        for (Playlists playlist : playlists){
+            if(playlist.getIs_selected()){
+                playlist.setIs_selected(false);
+                playlist.getHolder().selected_line.setBackgroundColor(Color.parseColor("#000000"));
+                playlist.setHolder(null);
+            }
+        }
     }
 
     @Override

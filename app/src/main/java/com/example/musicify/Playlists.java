@@ -6,10 +6,12 @@ public class Playlists {
     public String name;
     public ArrayList<Song> songs;
     public boolean is_selected;
+    public PlayListHolder holder;
 
     public Playlists(String name) {
         this.name = name;
         this.is_selected = false;
+        this.songs = new ArrayList<Song>();
     }
     public void addSong(Song song){
         this.songs.add(song);
@@ -28,6 +30,14 @@ public class Playlists {
 
     public ArrayList<Song> getSongs(){
         return songs;
+    }
+
+    public PlayListHolder getHolder(){
+        return this.holder;
+    }
+
+    public void setHolder(PlayListHolder holder){
+        this.holder = holder;
     }
 
     public boolean getIs_selected(){

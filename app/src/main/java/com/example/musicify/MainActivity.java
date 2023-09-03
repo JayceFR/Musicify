@@ -262,8 +262,10 @@ public class MainActivity extends AppCompatActivity {
     public void initialize(){
         Playlists all_song_playlist = new Playlists("All Songs");
         all_song_playlist.setSongs(getMusic());
+        Playlists no_song_trial = new Playlists("Liked Songs");
         ArrayList<Playlists> playlists = new ArrayList<Playlists>();
         playlists.add(all_song_playlist);
+        playlists.add(no_song_trial);
         RecyclerView recyclerView = findViewById(R.id.playlist_recylerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         PlayListAdapter playListAdapter = new PlayListAdapter(getApplicationContext(), playlists, player, songRecyclerView);
