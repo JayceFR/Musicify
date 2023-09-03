@@ -42,6 +42,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.titleView.setText(songs.get(position).title);
+        holder.menu_btn.setImageResource(R.drawable.ic_more);
         byte[] image = getAlbumArt(songs.get(position).getPath());
         if (image != null){
             Glide.with(context).asBitmap()

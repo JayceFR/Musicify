@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class MyViewHolder extends RecyclerView.ViewHolder {
-    ImageView imageView;
+    ImageView imageView, menu_btn;
     TextView titleView;
     View songView;
     public MyViewHolder(@NonNull View itemView) {
@@ -16,5 +16,6 @@ public class MyViewHolder extends RecyclerView.ViewHolder {
         imageView = itemView.findViewById(R.id.imageview);
         titleView = itemView.findViewById(R.id.title);
         songView = itemView.findViewById(R.id.songView);
+        menu_btn = itemView.findViewById(R.id.menu_btn);
     }
 }
