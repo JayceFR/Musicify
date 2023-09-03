@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     TextView homeSongNameView;
     SeekBar seekBar;
     TextView playpausebtn, skipNextBtn, skipPrevBtn, repeatBtn, shuffleBtn;
+    RecyclerView songRecyclerView;
     int repeatMode = 1; //repeat all = 1, repeat one = 2,
     int shuffleMode = 1;
     boolean is_bound = false;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         skipPrevBtn = findViewById(R.id.skipPrevBtn);
         repeatBtn = findViewById(R.id.repeat_btn);
         shuffleBtn = findViewById(R.id.shuffle_btn);
+        songRecyclerView = findViewById(R.id.recyclerView);
         //playwerControls();
         //bind to the player service
         doBindService();
@@ -86,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             initialize();
-            fetch_songs();
         }
     }
 
@@ -265,22 +266,8 @@ public class MainActivity extends AppCompatActivity {
         playlists.add(all_song_playlist);
         RecyclerView recyclerView = findViewById(R.id.playlist_recylerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        PlayListAdapter playListAdapter = new PlayListAdapter(getApplicationContext(), playlists);
+        PlayListAdapter playListAdapter = new PlayListAdapter(getApplicationContext(), playlists, player, songRecyclerView);
         recyclerView.setAdapter(playListAdapter);
-    }
-
-
-    //Modify this function in the future for Recycler View
-    public void fetch_songs(){
-        ArrayList<Song> songs = getMusic();
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        MyAdapter songAdapter = new MyAdapter(getApplicationContext(), songs, player);
-        ScaleInAnimationAdapter scaleInAnimationAdapter = new ScaleInAnimationAdapter(songAdapter);
-        scaleInAnimationAdapter.setDuration(1000);
-        scaleInAnimationAdapter.setInterpolator(new OvershootInterpolator());
-        scaleInAnimationAdapter.setFirstOnly(false);
-        recyclerView.setAdapter(scaleInAnimationAdapter);
     }
 
     public ArrayList<Song> getMusic(){
@@ -301,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
                 String path = songCursor.getString(songData);
                 int duration = songCursor.getInt(songDuration);
                 if (is_current_music == 1){
-                    Log.i(Tag, currentTitle + duration);
+                    Log.i("TEST", currentTitle + duration);
                     songs.add(new Song(currentTitle, currentArtist, duration, path));
                 }
 
@@ -310,6 +297,10 @@ public class MainActivity extends AppCompatActivity {
         }
         return songs;
     }
+
+
+    //Modify this function in the future for Recycler View
+
 
     @Override
     protected void onDestroy() {
@@ -339,7 +330,6 @@ public class MainActivity extends AppCompatActivity {
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(this, "Permission Granted! Enjoy Listening", Toast.LENGTH_SHORT).show();
                         initialize();
-                        fetch_songs();
                     }
                 } else {
                     Toast.makeText(this, "No Permission Granted!", Toast.LENGTH_SHORT).show();

@@ -26,6 +26,10 @@ public class Playlists {
         this.is_selected = val;
     }
 
+    public ArrayList<Song> getSongs(){
+        return songs;
+    }
+
     public boolean getIs_selected(){
         return this.is_selected;
     }
