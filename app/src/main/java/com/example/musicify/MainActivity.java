@@ -26,6 +26,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -53,9 +54,12 @@ public class MainActivity extends AppCompatActivity {
     SeekBar seekBar;
     TextView playpausebtn, skipNextBtn, skipPrevBtn, repeatBtn, shuffleBtn;
     RecyclerView songRecyclerView;
+    EditText add_playlist_txtbox;
+    TextView show_playlist_btn, add_playlist_btn;
     int repeatMode = 1; //repeat all = 1, repeat one = 2,
     int shuffleMode = 1;
     boolean is_bound = false;
+    boolean is_showing = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +75,26 @@ public class MainActivity extends AppCompatActivity {
         repeatBtn = findViewById(R.id.repeat_btn);
         shuffleBtn = findViewById(R.id.shuffle_btn);
         songRecyclerView = findViewById(R.id.recyclerView);
+        add_playlist_txtbox = findViewById(R.id.add_playlist_textbox);
+        show_playlist_btn = findViewById(R.id.show_add_playlist_txtbox);
+        add_playlist_btn = findViewById(R.id.add_playlist_btn);
+
+        show_playlist_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (is_showing){
+                    is_showing = false;
+                    add_playlist_txtbox.setVisibility(View.GONE);
+                    add_playlist_btn.setVisibility(View.GONE);
+                }
+                else{
+                    is_showing = true;
+                    add_playlist_txtbox.setVisibility(View.VISIBLE);
+                    add_playlist_btn.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
         //playwerControls();
         //bind to the player service
         doBindService();
