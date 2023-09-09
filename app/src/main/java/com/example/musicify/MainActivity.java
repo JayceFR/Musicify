@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         //playwerControls();
         //bind to the player service
         doBindService();
@@ -134,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-
+            Log.i(Tag, "Service is disconnected");
         }
     };
 
@@ -294,6 +295,14 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         PlayListAdapter playListAdapter = new PlayListAdapter(getApplicationContext(), playlists, player, songRecyclerView);
         recyclerView.setAdapter(playListAdapter);
+        add_playlist_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playlists.add(new Playlists(add_playlist_txtbox.getText().toString()));
+                Toast.makeText(getApplicationContext(), "Successfully created playlist " + add_playlist_txtbox.getText().toString(), Toast.LENGTH_SHORT).show();
+                playListAdapter.notifyItemInserted(playlists.size()-1);
+            }
+        });
     }
 
     public ArrayList<Song> getMusic(){
