@@ -285,12 +285,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void initialize(){
-        Playlists all_song_playlist = new Playlists("All Songs");
+        Playlists all_song_playlist = new Playlists(-1,"All Songs");
         all_song_playlist.setSongs(getMusic());
-        Playlists no_song_trial = new Playlists("Liked Songs");
+        Playlists no_song_trial = new Playlists(0,"Liked Songs");
         ArrayList<Playlists> playlists = new ArrayList<Playlists>();
         playlists.add(all_song_playlist);
         playlists.add(no_song_trial);
+        //To get all the lists from the database
+        playlists.addAll(new MusicDatabaseHelper(MainActivity.this).getPlaylists());
         RecyclerView recyclerView = findViewById(R.id.playlist_recylerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         PlayListAdapter playListAdapter = new PlayListAdapter(getApplicationContext(), playlists, player, songRecyclerView);
@@ -298,9 +300,12 @@ public class MainActivity extends AppCompatActivity {
         add_playlist_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                playlists.add(new Playlists(add_playlist_txtbox.getText().toString()));
-                Toast.makeText(getApplicationContext(), "Successfully created playlist " + add_playlist_txtbox.getText().toString(), Toast.LENGTH_SHORT).show();
-                playListAdapter.notifyItemInserted(playlists.size()-1);
+//                playlists.add(new Playlists(add_playlist_txtbox.getText().toString()));
+//                Toast.makeText(getApplicationContext(), "Successfully created playlist " + add_playlist_txtbox.getText().toString(), Toast.LENGTH_SHORT).show();
+//                playListAdapter.notifyItemInserted(playlists.size()-1);
+                MusicDatabaseHelper musicDatabaseHelper = new MusicDatabaseHelper(MainActivity.this);
+                boolean result = musicDatabaseHelper.addPlaylist(add_playlist_txtbox.getText().toString());
+                Toast.makeText(MainActivity.this, "Success: "+ result, Toast.LENGTH_SHORT).show();
             }
         });
     }

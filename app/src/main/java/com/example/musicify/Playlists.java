@@ -3,12 +3,14 @@ package com.example.musicify;
 import java.util.ArrayList;
 
 public class Playlists {
+    public int id;
     public String name;
     public ArrayList<Song> songs;
     public boolean is_selected;
     public PlayListHolder holder;
 
-    public Playlists(String name) {
+    public Playlists(int id, String name) {
+        this.id = id;
         this.name = name;
         this.is_selected = false;
         this.songs = new ArrayList<Song>();
