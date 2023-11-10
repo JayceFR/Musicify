@@ -37,13 +37,27 @@ public class MusicDatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public boolean isPresent(String tableName, String column_Name, String value){
+        String query = "SELECT COUNT(*)" + " FROM " + tableName + " WHERE " + column_Name + " = '" + value + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        return (count == 0) ? false : true;
+    }
+
     public boolean addPlaylist(String name){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        //TODO need to perform a check to see whether there exists a playlist with the same name stored in the database
-        cv.put(Column_Name, name);
-        cv.put(Column_Noofsongs, 0);
-        long result = db.insert(TableName, null, cv);
+        boolean isthere = isPresent(TableName, Column_Name, name);
+        long result = -1;
+        if (!isthere){
+            cv.put(Column_Name, name);
+            cv.put(Column_Noofsongs, 0);
+            result = db.insert(TableName, null, cv);
+        }
         return result != -1;
     }
 

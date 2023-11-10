@@ -321,15 +321,17 @@ public class MainActivity extends AppCompatActivity {
             int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
             int songData = songCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
             int isSong = songCursor.getColumnIndex(MediaStore.Audio.Media.IS_MUSIC);
+            int idColumn = songCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             do {
                 String currentTitle = songCursor.getString(songTitle);
                 String currentArtist = songCursor.getString(songArtist);
+                String currentId = songCursor.getString(idColumn);
                 int is_current_music = songCursor.getInt(isSong);
                 String path = songCursor.getString(songData);
                 int duration = songCursor.getInt(songDuration);
                 if (is_current_music == 1){
-                    Log.i("TEST", currentTitle + duration);
-                    songs.add(new Song(currentTitle, currentArtist, duration, path));
+                    Log.i("TEST", currentTitle + duration + " id:  " + currentId);
+                    songs.add(new Song(currentId, currentTitle, currentArtist, duration, path));
                 }
 
             }while (songCursor.moveToNext());

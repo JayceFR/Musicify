@@ -5,12 +5,14 @@ public class Song {
     public String artist;
     public int duration;
     public String path;
+    public String id;
 
-    public Song(String title, String artist, int duration, String path) {
+    public Song(String id, String title, String artist, int duration, String path) {
         this.title = title;
         this.artist = artist;
         this.duration = duration;
         this.path = path;
+        this.id = id;
     }
 
     public String getTitle() {

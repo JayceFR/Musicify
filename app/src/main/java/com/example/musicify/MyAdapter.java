@@ -6,8 +6,11 @@ import android.media.MediaMetadataRetriever;
 import android.media.browse.MediaBrowser;
 import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,10 +25,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
+public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements PopupMenu.OnMenuItemClickListener {
     Context context;
     List<Song> songs;
     ExoPlayer player;
+
+    int current_song_pos = -1;
 
     public MyAdapter(Context context, List<Song> songs, ExoPlayer player) {
         this.context = context;
@@ -37,6 +42,30 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new MyViewHolder(LayoutInflater.from(context).inflate(R.layout.music_view,parent, false));
+    }
+
+    public void showPopup(View view, int position){
+        PopupMenu popupMenu = new PopupMenu(context, view);
+        MusicDatabaseHelper databaseHelper = new MusicDatabaseHelper(context);
+        //Adding items to the popup menu.
+        ArrayList<Playlists> playlists = databaseHelper.getPlaylists();
+        popupMenu.inflate(R.menu.popup_menu);
+        Menu menu = popupMenu.getMenu();
+        for (int i =0; i < playlists.size(); i++) {
+            menu.add(playlists.get(i).name);
+        }
+        this.current_song_pos = position;
+        popupMenu.setOnMenuItemClickListener(this);
+        popupMenu.show();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem menuItem) {
+        Toast.makeText(context, menuItem.getTitle().toString(), Toast.LENGTH_SHORT).show();
+        //TODO Add the song to the song class if not there
+        //TODO Then link the song to the playlist if not present
+
+        return false;
     }
 
     @Override
@@ -66,6 +95,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
             player.prepare();
             player.play();
         });
+        holder.menu_btn.setOnClickListener(view -> showPopup(view, position));
 //        holder.songView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
