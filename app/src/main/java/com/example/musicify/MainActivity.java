@@ -315,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
         Uri songURI = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor songCursor = contentResolver.query(songURI, null, null, null,null);
         ArrayList<Song> songs = new ArrayList<Song>();
+        MusicDatabaseHelper databaseHelper = new MusicDatabaseHelper(MainActivity.this);
         if (songCursor != null && songCursor.moveToFirst()){
             int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
@@ -328,6 +329,10 @@ public class MainActivity extends AppCompatActivity {
                 String currentId = songCursor.getString(idColumn);
                 int is_current_music = songCursor.getInt(isSong);
                 String path = songCursor.getString(songData);
+                boolean result = databaseHelper.verifySong(currentId);
+                if (result){
+                    Toast.makeText(MainActivity.this, "Found New Song" + currentTitle, Toast.LENGTH_SHORT).show();
+                }
                 int duration = songCursor.getInt(songDuration);
                 if (is_current_music == 1){
                     Log.i("TEST", currentTitle + duration + " id:  " + currentId);
