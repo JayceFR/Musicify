@@ -64,7 +64,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements Pop
         Toast.makeText(context, menuItem.getTitle().toString(), Toast.LENGTH_SHORT).show();
         //TODO Add the song to the song class if not there
         //TODO Then link the song to the playlist if not present
-
+        MusicDatabaseHelper databaseHelper = new MusicDatabaseHelper(context);
+        boolean result = databaseHelper.addToPlaylist(menuItem.getTitle().toString(), songs.get(this.current_song_pos).id);
         return false;
     }
 

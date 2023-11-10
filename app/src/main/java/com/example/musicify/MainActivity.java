@@ -329,13 +329,13 @@ public class MainActivity extends AppCompatActivity {
                 String currentId = songCursor.getString(idColumn);
                 int is_current_music = songCursor.getInt(isSong);
                 String path = songCursor.getString(songData);
-                boolean result = databaseHelper.verifySong(currentId);
-                if (result){
-                    Toast.makeText(MainActivity.this, "Found New Song" + currentTitle, Toast.LENGTH_SHORT).show();
-                }
                 int duration = songCursor.getInt(songDuration);
                 if (is_current_music == 1){
                     Log.i("TEST", currentTitle + duration + " id:  " + currentId);
+                    boolean result = databaseHelper.verifySong(currentId, currentTitle, currentArtist, duration, path);
+                    if (result){
+                        Toast.makeText(MainActivity.this, "Found New Song" + currentTitle, Toast.LENGTH_SHORT).show();
+                    }
                     songs.add(new Song(currentId, currentTitle, currentArtist, duration, path));
                 }
 
