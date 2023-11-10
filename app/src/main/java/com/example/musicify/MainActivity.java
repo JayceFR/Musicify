@@ -304,7 +304,13 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.makeText(getApplicationContext(), "Successfully created playlist " + add_playlist_txtbox.getText().toString(), Toast.LENGTH_SHORT).show();
 //                playListAdapter.notifyItemInserted(playlists.size()-1);
                 MusicDatabaseHelper musicDatabaseHelper = new MusicDatabaseHelper(MainActivity.this);
-                boolean result = musicDatabaseHelper.addPlaylist(add_playlist_txtbox.getText().toString());
+                int id = musicDatabaseHelper.addPlaylist(add_playlist_txtbox.getText().toString());
+                boolean result = false;
+                if (id != -1){
+                    result = true;
+                    playlists.add(new Playlists(id, add_playlist_txtbox.getText().toString()));
+                    playListAdapter.notifyItemInserted(playlists.size()-1);
+                }
                 Toast.makeText(MainActivity.this, "Success: "+ result, Toast.LENGTH_SHORT).show();
             }
         });

@@ -151,17 +151,26 @@ public class MusicDatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
-    public boolean addPlaylist(String name){
+    public int addPlaylist(String name){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         boolean isthere = isPresent(TableName, Column_Name, name);
+        int id = -1;
         long result = -1;
         if (!isthere){
             cv.put(Column_Name, name);
             cv.put(Column_Noofsongs, 0);
             result = db.insert(TableName, null, cv);
         }
-        return result != -1;
+        if (result != -1){
+            String query = "SELECT " + ColumnId + " FROM " + TableName + " WHERE " + Column_Name + " = '" + name + "';";
+            Cursor cursor = db.rawQuery(query, null);
+            if (cursor.moveToFirst()){
+                id = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+        return id;
     }
 
     public ArrayList<Playlists> getPlaylists(){
