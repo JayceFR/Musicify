@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -110,6 +111,44 @@ public class MusicDatabaseHelper extends SQLiteOpenHelper {
         cv.put(LinkerColumnOrder, order);
         long result = db.insert(TableLinker, null, cv);
         return result != -1;
+    }
+
+    public ArrayList<Song> getSongFromPlaylist(int playlist_id){
+        ArrayList<Song> songs = new ArrayList<>();
+        String query = "SELECT " + LinkerColumnSongID + " FROM " + TableLinker + " WHERE " + LinkerColumnPlaylistID + " = " + playlist_id + " ORDER BY " + LinkerColumnOrder;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()){
+            do{
+                String id = cursor.getString(0);
+                Song song = getSong(id);
+                if (song != null){
+                    Log.i("TEST", song.toString());
+                    songs.add(song);
+                }
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        return songs;
+    }
+
+    public Song getSong(String id){
+        //Check if the id is present in the datatabase
+        boolean is_there = isPresent(TableSong, SongColumnID, id);
+        if (is_there){
+            String query_string = "SELECT * FROM " + TableSong + " WHERE " + SongColumnID + " = '" + id + "';";
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery(query_string, null);
+            if (cursor.moveToFirst()){
+                String title = cursor.getString(1);
+                String artist = cursor.getString(2);
+                int duration = cursor.getInt(3);
+                String path = cursor.getString(4);
+                return new Song(id, title, artist, duration, path);
+            }
+            cursor.close();
+        }
+        return null;
     }
 
     public boolean addPlaylist(String name){

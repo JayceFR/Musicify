@@ -62,6 +62,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
                     playlists.get(position).setIs_selected(true);
                     playlists.get(position).setHolder(holder);
                     //get all the songs
+                    if (playlists.get(position).id != -1){
+                        update_songs(position);
+                    }
                     fetch_songs(context, player, recyclerView, playlists.get(position).getSongs());
                 }
                 else{
@@ -80,6 +83,13 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
                 playlist.setHolder(null);
             }
         }
+    }
+
+    public void update_songs(int position){
+        MusicDatabaseHelper databaseHelper = new MusicDatabaseHelper(this.context);
+        ArrayList<Song> songs = databaseHelper.getSongFromPlaylist(playlists.get(position).id);
+        Log.i("TEST", songs.toString());
+        playlists.get(position).setSongs(songs);
     }
 
     @Override
