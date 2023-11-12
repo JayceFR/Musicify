@@ -29,13 +29,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements Pop
     Context context;
     List<Song> songs;
     ExoPlayer player;
+    boolean play_list_change;
 
     int current_song_pos = -1;
 
-    public MyAdapter(Context context, List<Song> songs, ExoPlayer player) {
+    public MyAdapter(Context context, List<Song> songs, ExoPlayer player, boolean play_list_change) {
         this.context = context;
         this.songs = songs;
         this.player = player;
+        this.play_list_change = play_list_change;
+
     }
 
     @NonNull
@@ -86,6 +89,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements Pop
         }
         holder.songView.setOnClickListener(view -> {
             context.startService(new Intent(context.getApplicationContext(), PlayerService.class));
+            if (play_list_change){
+                player.setMediaItems(getMediaItems(), position, 0);
+                play_list_change = false;
+            }
             if (!player.isPlaying()){
                 player.setMediaItems(getMediaItems(), position, 0);
             }

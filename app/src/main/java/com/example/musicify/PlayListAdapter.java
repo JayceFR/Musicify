@@ -30,12 +30,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
     List<Playlists> playlists;
     ExoPlayer player;
     RecyclerView recyclerView;
+    MyAdapter songAdapter;
 
     public PlayListAdapter(Context context, List<Playlists> playlists, ExoPlayer player, RecyclerView recyclerView) {
         this.context = context;
         this.playlists = playlists;
         this.player = player;
         this.recyclerView = recyclerView;
+        this.songAdapter = null;
     }
 
     @NonNull
@@ -66,6 +68,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
                         update_songs(position);
                     }
                     fetch_songs(context, player, recyclerView, playlists.get(position).getSongs());
+
+
                 }
                 else{
                     holder.selected_line.setBackgroundColor(Color.parseColor("#000000"));
@@ -99,7 +103,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
 
     public void fetch_songs(Context context, ExoPlayer player, RecyclerView recyclerView, ArrayList<Song> songs){
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        MyAdapter songAdapter = new MyAdapter(context, songs, player);
+        MyAdapter songAdapter = new MyAdapter(context, songs, player, true);
         ScaleInAnimationAdapter scaleInAnimationAdapter = new ScaleInAnimationAdapter(songAdapter);
         scaleInAnimationAdapter.setDuration(1000);
         scaleInAnimationAdapter.setInterpolator(new OvershootInterpolator());
