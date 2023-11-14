@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.media.MediaMetadataRetriever;
 import android.media.browse.MediaBrowser;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -141,7 +143,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements Pop
     public byte[] getAlbumArt(String uri){
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(uri);
-        byte[] art = retriever.getEmbeddedPicture();
+        //retriever.getEmbeddedPicture()
+        byte[] art = null ;
         try {
             retriever.close();
         } catch (IOException e) {

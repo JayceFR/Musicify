@@ -8,9 +8,16 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.session.PlaybackState;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.ResultReceiver;
+import android.support.v4.media.MediaDescriptionCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -21,6 +28,8 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.audio.AudioAttributes;
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
+import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator;
 import com.google.android.exoplayer2.ui.PlayerNotificationManager;
 import com.google.android.exoplayer2.util.Log;
 
@@ -34,6 +43,7 @@ public class PlayerService extends Service {
 
     ExoPlayer player;
     PlayerNotificationManager notificationManager;
+    MediaSessionCompat mediaSession;
 
     //class binder for clients
     public class ServiceBinder extends Binder{
@@ -78,6 +88,63 @@ public class PlayerService extends Service {
         notificationManager.setUseRewindAction(false);
         notificationManager.setUseFastForwardAction(false);
 
+        mediaSession = new MediaSessionCompat(getApplicationContext(), "Musicify");
+        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mediaSession.setCallback(new MediaSessionCompat.Callback() {
+            @Override
+            public void onPlay() {
+                player.setPlayWhenReady(true);
+            }
+
+            @Override
+            public void onPause() {
+                player.setPlayWhenReady(false);
+            }
+        });
+        PlaybackStateCompat playbackState = new PlaybackStateCompat.Builder().setState(PlaybackStateCompat.STATE_PLAYING, 0, 1.0f).build();
+        mediaSession.setPlaybackState(playbackState);
+        MediaSessionConnector mediaSessionConnector = new MediaSessionConnector(mediaSession);
+        mediaSessionConnector.setPlayer(player);
+        mediaSessionConnector.setPlaybackPreparer(new MediaSessionConnector.PlaybackPreparer() {
+            @Override
+            public long getSupportedPrepareActions() {
+                return PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE;
+            }
+
+            @Override
+            public void onPrepare(boolean playWhenReady) {
+
+            }
+
+            @Override
+            public void onPrepareFromMediaId(String mediaId, boolean playWhenReady, @Nullable Bundle extras) {
+
+            }
+
+            @Override
+            public void onPrepareFromSearch(String query, boolean playWhenReady, @Nullable Bundle extras) {
+
+            }
+
+            @Override
+            public void onPrepareFromUri(Uri uri, boolean playWhenReady, @Nullable Bundle extras) {
+
+            }
+
+            @Override
+            public boolean onCommand(Player player, String command, @Nullable Bundle extras, @Nullable ResultReceiver cb) {
+                return false;
+            }
+        });
+
+        mediaSession.setActive(true);
+
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        stopSelf();
     }
 
     @Override
@@ -89,6 +156,7 @@ public class PlayerService extends Service {
         }
         notificationManager.setPlayer(null);
         player.release();
+        mediaSession.release();
         player = null;
         stopForeground(true);
         stopSelf();
