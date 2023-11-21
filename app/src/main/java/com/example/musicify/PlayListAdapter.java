@@ -31,6 +31,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
     ExoPlayer player;
     RecyclerView recyclerView;
     MyAdapter songAdapter;
+    Boolean onLoad;
 
     public PlayListAdapter(Context context, List<Playlists> playlists, ExoPlayer player, RecyclerView recyclerView) {
         this.context = context;
@@ -38,6 +39,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
         this.player = player;
         this.recyclerView = recyclerView;
         this.songAdapter = null;
+        this.onLoad = true;
     }
 
     @NonNull
@@ -53,6 +55,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
         holder.playlist_name.setText(playlists.get(position).name);
         holder.playlist_menu_btn.setImageResource(R.drawable.ic_trash);
         Log.i("TEST", String.valueOf(playlists.get(position).getIs_selected()));
+        if ( onLoad && playlists.get(position).id == -1 && playlists.get(position).getIs_selected()){
+            playlists.get(position).setHolder(holder);
+            holder.selected_line.setBackgroundColor(Color.parseColor("#ffffff"));
+            fetch_songs(context, player, recyclerView, playlists.get(position).getSongs());
+            onLoad = false;
+        }
         holder.playlist_view.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -71,10 +79,10 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
 
 
                 }
-                else{
-                    holder.selected_line.setBackgroundColor(Color.parseColor("#000000"));
-                    playlists.get(position).setIs_selected(false);
-                }
+//                else{
+//                    holder.selected_line.setBackgroundColor(Color.parseColor("#000000"));
+//                    playlists.get(position).setIs_selected(false);
+//                }
             }
         });
     }
@@ -88,6 +96,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
             }
         }
     }
+
 
     public void update_songs(int position){
         MusicDatabaseHelper databaseHelper = new MusicDatabaseHelper(this.context);

@@ -310,10 +310,9 @@ public class MainActivity extends AppCompatActivity {
     public void initialize(){
         Playlists all_song_playlist = new Playlists(-1,"All Songs");
         all_song_playlist.setSongs(getMusic());
-        Playlists no_song_trial = new Playlists(0,"Liked Songs");
+        all_song_playlist.setIs_selected(true);
         ArrayList<Playlists> playlists = new ArrayList<Playlists>();
         playlists.add(all_song_playlist);
-        playlists.add(no_song_trial);
         //To get all the lists from the database
         playlists.addAll(new MusicDatabaseHelper(MainActivity.this).getPlaylists());
         RecyclerView recyclerView = findViewById(R.id.playlist_recylerView);
