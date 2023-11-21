@@ -174,16 +174,27 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                if (isPlaying){
+                    playpausebtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pause, 0,0,0);
+                }
+                else{
+                    playpausebtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_play, 0,0,0);
+                }
+                Player.Listener.super.onIsPlayingChanged(isPlaying);
+            }
+
+            @Override
             public void onPlaybackStateChanged(int playbackState) {
                 Player.Listener.super.onPlaybackStateChanged(playbackState);
                 if (playbackState == ExoPlayer.STATE_READY){
                     homeSongNameView.setText(Objects.requireNonNull(player.getCurrentMediaItem()).mediaMetadata.title);
                     seekBar.setMax((int) player.getDuration());
-                    playpausebtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pause, 0,0,0);
+                    playpausebtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_play, 0,0,0);
                     updatePlayerPositionProgress();
                 }
                 else{
-                    playpausebtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_play, 0,0,0);
+                    playpausebtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_pause, 0,0,0);
                 }
             }
         });
