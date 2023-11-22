@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.session.PlaybackState;
 import android.net.Uri;
@@ -74,7 +75,7 @@ public class PlayerService extends Service {
                 .setNotificationListener(notificationListener)
                 .setMediaDescriptionAdapter(descriptionAdapter)
                 .setChannelImportance(IMPORTANCE_HIGH)
-                .setSmallIconResourceId(R.drawable.headphone_pic)
+                .setSmallIconResourceId(R.mipmap.ic_launcher_round)
                 .setChannelDescriptionResourceId(R.string.app_name)
                 .setNextActionIconResourceId(R.drawable.ic_arrow_next)
                 .setPreviousActionIconResourceId(R.drawable.ic_arrow_back)
@@ -84,9 +85,11 @@ public class PlayerService extends Service {
                 .build();
         //set player to notification manager
         notificationManager.setPlayer(player);
-        notificationManager.setPriority(NotificationCompat.PRIORITY_MAX);
+        notificationManager.setPriority(NotificationCompat.PRIORITY_HIGH);
         notificationManager.setUseRewindAction(false);
         notificationManager.setUseFastForwardAction(false);
+        notificationManager.setSmallIcon(R.mipmap.ic_launcher_round);
+        notificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         mediaSession = new MediaSessionCompat(getApplicationContext(), "Musicify");
         mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);

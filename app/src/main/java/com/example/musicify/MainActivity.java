@@ -123,7 +123,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        else{
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_MEDIA_AUDIO)){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 2);
+                }
+            }
+            else{
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 2);
+                }
+            }
+        }
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
             initialize();
         }
     }
@@ -403,12 +415,24 @@ public class MainActivity extends AppCompatActivity {
             case 1: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(this, "Permission Granted! Enjoy Listening", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Permission Granted For Reading Media", Toast.LENGTH_SHORT).show();
                         initialize();
                     }
                 } else {
-                    Toast.makeText(this, "No Permission Granted!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "No Permission Granted For Reading Media!", Toast.LENGTH_SHORT).show();
                     finish();
+                }
+                return;
+            }
+            case 2: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED){
+                        Toast.makeText(this, "Permission for notificaton granted", Toast.LENGTH_SHORT).show();
+                        initialize();
+                    }
+                    else{
+                        Toast.makeText(this, "No permission granted for notifications", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 return;
             }
