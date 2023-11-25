@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.musicify.adapter.PlayListAdapter;
+import com.example.musicify.service.SensorService;
 import com.example.musicify.util.Sensor;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     int repeatMode = 1; //repeat all = 1, repeat one = 2,
     int shuffleMode = 1;
     boolean is_bound = false;
+    boolean is_sensor_service_bound = false;
     boolean is_showing = false;
     Sensor sensor;
     @Override
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         animationDrawable.start();
 
         //sensor
-        sensor = new Sensor(MainActivity.this, (SensorManager) getSystemService(Context.SENSOR_SERVICE), (Vibrator) getSystemService(Context.VIBRATOR_SERVICE));
+        //sensor = new Sensor(MainActivity.this, (SensorManager) getSystemService(Context.SENSOR_SERVICE), (Vibrator) getSystemService(Context.VIBRATOR_SERVICE));
 
         //player = new ExoPlayer.Builder(this).build();
         homeSongNameView = findViewById(R.id.homeSongNameView);
@@ -153,6 +155,25 @@ public class MainActivity extends AppCompatActivity {
         bindService(playerServiceIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
+    public void bindSensor(){
+        Intent sensorServiceIntent = new Intent(this, SensorService.class);
+        bindService(sensorServiceIntent, sensorServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    ServiceConnection sensorServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            SensorService.SensorBinder binder = (SensorService.SensorBinder) iBinder;
+            sensor = binder.getSensor().sensor;
+            is_sensor_service_bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            Log.i(Tag, "Service is disconnected");
+        }
+    };
+
     ServiceConnection playerServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -163,6 +184,8 @@ public class MainActivity extends AppCompatActivity {
             requestPermission();
             //ready to show the songs
             playwerControls();
+            //Bind the sensor
+            bindSensor();
         }
 
         @Override
@@ -170,19 +193,6 @@ public class MainActivity extends AppCompatActivity {
             Log.i(Tag, "Service is disconnected");
         }
     };
-
-    @Override
-    protected void onResume() {
-        sensor.registerListener();
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        sensor.unregisterListener();
-        super.onPause();
-    }
-
 
     public void playwerControls(){
         homeSongNameView.setSelected(true);
@@ -351,8 +361,9 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.playlist_recylerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         PlayListAdapter playListAdapter = new PlayListAdapter(getApplicationContext(), playlists, player, songRecyclerView);
-        sensor.setPlayer(player);
         recyclerView.setAdapter(playListAdapter);
+        //Set the player
+        sensor.setPlayer(player);
         add_playlist_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -429,6 +440,11 @@ public class MainActivity extends AppCompatActivity {
             unbindService(playerServiceConnection);
             is_bound = false;
         }
+        if (is_sensor_service_bound){
+            unbindService(sensorServiceConnection);
+            is_sensor_service_bound = false;
+        }
+
     }
 
     @Override

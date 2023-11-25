@@ -25,6 +25,7 @@
             android:name=".PlayerService"
             android:enabled="true"
             android:exported="false"></service>
+        <service android:name=".service.SensorService"/>
 
         <activity
             android:name=".MainActivity"
