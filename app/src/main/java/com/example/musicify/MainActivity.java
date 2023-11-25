@@ -18,33 +18,30 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.drawable.AnimationDrawable;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.provider.MediaStore;
-import android.support.v4.media.session.MediaControllerCompat;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.OvershootInterpolator;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.load.data.ExifOrientationStream;
+import com.example.musicify.adapter.PlayListAdapter;
+import com.example.musicify.util.Sensor;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Objects;
-
-import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -62,10 +59,21 @@ public class MainActivity extends AppCompatActivity {
     int shuffleMode = 1;
     boolean is_bound = false;
     boolean is_showing = false;
+    Sensor sensor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Background gradient
+        ConstraintLayout constraintLayout = findViewById(R.id.main_layout);
+        AnimationDrawable animationDrawable = (AnimationDrawable) constraintLayout.getBackground();
+        animationDrawable.setEnterFadeDuration(2500);
+        animationDrawable.setExitFadeDuration(5000);
+        animationDrawable.start();
+
+        //sensor
+        sensor = new Sensor(MainActivity.this, (SensorManager) getSystemService(Context.SENSOR_SERVICE), (Vibrator) getSystemService(Context.VIBRATOR_SERVICE));
 
         //player = new ExoPlayer.Builder(this).build();
         homeSongNameView = findViewById(R.id.homeSongNameView);
@@ -162,6 +170,19 @@ public class MainActivity extends AppCompatActivity {
             Log.i(Tag, "Service is disconnected");
         }
     };
+
+    @Override
+    protected void onResume() {
+        sensor.registerListener();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        sensor.unregisterListener();
+        super.onPause();
+    }
+
 
     public void playwerControls(){
         homeSongNameView.setSelected(true);
@@ -330,6 +351,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.playlist_recylerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         PlayListAdapter playListAdapter = new PlayListAdapter(getApplicationContext(), playlists, player, songRecyclerView);
+        sensor.setPlayer(player);
         recyclerView.setAdapter(playListAdapter);
         add_playlist_btn.setOnClickListener(new View.OnClickListener() {
             @Override

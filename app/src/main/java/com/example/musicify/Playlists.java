@@ -1,5 +1,7 @@
 package com.example.musicify;
 
+import com.example.musicify.holder.PlayListHolder;
+
 import java.util.ArrayList;
 
 public class Playlists {

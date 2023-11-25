@@ -1,12 +1,9 @@
-package com.example.musicify;
+package com.example.musicify.adapter;
 
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaMetadataRetriever;
-import android.media.browse.MediaBrowser;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.support.v4.media.session.MediaControllerCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +16,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.musicify.MusicDatabaseHelper;
+import com.example.musicify.holder.MyViewHolder;
+import com.example.musicify.PlayerService;
+import com.example.musicify.Playlists;
+import com.example.musicify.R;
+import com.example.musicify.Song;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.MediaMetadata;
@@ -74,20 +77,20 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements Pop
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.titleView.setText(songs.get(position).title);
-        holder.menu_btn.setImageResource(R.drawable.ic_more);
+        holder.getTitleView().setText(songs.get(position).title);
+        holder.getMenu_btn().setImageResource(R.drawable.ic_more);
         byte[] image = getAlbumArt(songs.get(position).getPath());
         if (image != null){
             Glide.with(context).asBitmap()
                     .load(image)
-                    .into(holder.imageView);
+                    .into(holder.getImageView());
         }
         else{
             Glide.with(context).
                     load(R.drawable.headphone_pic).
-                    into(holder.imageView);
+                    into(holder.getImageView());
         }
-        holder.songView.setOnClickListener(view -> {
+        holder.getSongView().setOnClickListener(view -> {
             context.startService(new Intent(context.getApplicationContext(), PlayerService.class));
             if (play_list_change){
                 player.setMediaItems(getMediaItems(), position, 0);
@@ -103,7 +106,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements Pop
             player.prepare();
             player.play();
         });
-        holder.menu_btn.setOnClickListener(view -> showPopup(view, position));
+        holder.getMenu_btn().setOnClickListener(view -> showPopup(view, position));
 //        holder.songView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {

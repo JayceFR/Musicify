@@ -1,12 +1,7 @@
-package com.example.musicify;
+package com.example.musicify.adapter;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +12,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.musicify.MusicDatabaseHelper;
+import com.example.musicify.holder.PlayListHolder;
+import com.example.musicify.Playlists;
+import com.example.musicify.R;
+import com.example.musicify.Song;
 import com.google.android.exoplayer2.ExoPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
-import kotlin.text.RegexOption;
 
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
     Context context;
@@ -52,23 +51,23 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull PlayListHolder holder, int position) {
-        holder.playlist_name.setText(playlists.get(position).name);
-        holder.playlist_menu_btn.setImageResource(R.drawable.ic_trash);
+        holder.getPlaylist_name().setText(playlists.get(position).name);
+        holder.getPlaylist_menu_btn().setImageResource(R.drawable.ic_trash);
         Log.i("TEST", String.valueOf(playlists.get(position).getIs_selected()));
         if ( onLoad && playlists.get(position).id == -1 && playlists.get(position).getIs_selected()){
             playlists.get(position).setHolder(holder);
-            holder.selected_line.setBackgroundColor(Color.parseColor("#ffffff"));
+            holder.getSelected_line().setBackgroundColor(Color.parseColor("#ffffff"));
             fetch_songs(context, player, recyclerView, playlists.get(position).getSongs());
             onLoad = false;
         }
-        holder.playlist_view.setOnClickListener(new View.OnClickListener() {
+        holder.getPlaylist_view().setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
                 if (!playlists.get(position).getIs_selected()){
                     reset_rest();
                     Log.i("TEST", "selected is true");
-                    holder.selected_line.setBackgroundColor(Color.parseColor("#ffffff"));
+                    holder.getSelected_line().setBackgroundColor(Color.parseColor("#ffffff"));
                     playlists.get(position).setIs_selected(true);
                     playlists.get(position).setHolder(holder);
                     //get all the songs
@@ -91,7 +90,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
         for (Playlists playlist : playlists){
             if(playlist.getIs_selected()){
                 playlist.setIs_selected(false);
-                playlist.getHolder().selected_line.setBackgroundColor(Color.parseColor("#000000"));
+                playlist.getHolder().getSelected_line().setBackgroundColor(Color.parseColor("#00ff0000"));
                 playlist.setHolder(null);
             }
         }
