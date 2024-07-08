@@ -7,16 +7,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.musicify.MusicDatabaseHelper;
+import com.example.musicify.util.MusicDatabaseHelper;
 import com.example.musicify.holder.PlayListHolder;
 import com.example.musicify.Playlists;
 import com.example.musicify.R;
 import com.example.musicify.Song;
+import com.example.musicify.interfaces.PlaylistInterface;
 import com.google.android.exoplayer2.ExoPlayer;
 
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import java.util.List;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
+    private final PlaylistInterface playlistInterface;
     Context context;
     List<Playlists> playlists;
     ExoPlayer player;
@@ -32,20 +35,21 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
     MyAdapter songAdapter;
     Boolean onLoad;
 
-    public PlayListAdapter(Context context, List<Playlists> playlists, ExoPlayer player, RecyclerView recyclerView) {
+    public PlayListAdapter(Context context, List<Playlists> playlists, ExoPlayer player, RecyclerView recyclerView, PlaylistInterface playlistInterface) {
         this.context = context;
         this.playlists = playlists;
         this.player = player;
         this.recyclerView = recyclerView;
         this.songAdapter = null;
         this.onLoad = true;
+        this.playlistInterface = playlistInterface;
     }
 
     @NonNull
     @Override
     public PlayListHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.playlist_view, parent, false);
-        return new PlayListHolder(view).linkAdapter(this);
+        return new PlayListHolder(view, playlistInterface).linkAdapter(this);
 //        return new PlayListHolder(LayoutInflater.from(context).inflate(R.layout.playlist_view, parent, false));
     }
 
@@ -102,6 +106,18 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
         ArrayList<Song> songs = databaseHelper.getSongFromPlaylist(playlists.get(position).id);
         Log.i("TEST", songs.toString());
         playlists.get(position).setSongs(songs);
+    }
+
+    public void delete_playlist(int position){
+        MusicDatabaseHelper databaseHelper = new MusicDatabaseHelper(this.context);
+        boolean success = databaseHelper.delete_playlist(String.valueOf(playlists.get(position).getId()));
+        if (success){
+            Toast.makeText(this.context, "Removed playlist", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(this.context, "Failed in removing playlist", Toast.LENGTH_SHORT).show();
+        }
+        playlists = databaseHelper.getPlaylists();
     }
 
     @Override

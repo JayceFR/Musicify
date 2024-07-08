@@ -1,4 +1,4 @@
-package com.example.musicify;
+package com.example.musicify.util;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,6 +10,9 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.provider.FontsContractCompat;
+
+import com.example.musicify.Playlists;
+import com.example.musicify.Song;
 
 import java.util.ArrayList;
 
@@ -171,6 +174,21 @@ public class MusicDatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return id;
+    }
+
+    public boolean delete_playlist(String id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        boolean referential_integrity = false;
+        //remove the link in the linker for maintaining referential integrity
+        String queryString = "DELETE FROM " + TableLinker + " WHERE " + LinkerColumnPlaylistID + " = " + id;
+        Cursor cursor = db.rawQuery(queryString, null);
+        if (cursor.moveToFirst()) {
+            referential_integrity = true;
+        }
+        //remove the playlist
+        String remove_playlist_query = "DELETE FROM " + TableName + " WHERE " + ColumnId + " = " + id;
+        Cursor cursor1 = db.rawQuery(remove_playlist_query, null);
+        return cursor1.moveToFirst() && referential_integrity;
     }
 
     public ArrayList<Playlists> getPlaylists(){

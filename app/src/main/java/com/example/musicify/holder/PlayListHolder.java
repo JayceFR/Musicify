@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicify.R;
 import com.example.musicify.adapter.PlayListAdapter;
+import com.example.musicify.interfaces.PlaylistInterface;
 
 public class PlayListHolder extends RecyclerView.ViewHolder {
 
@@ -18,12 +19,25 @@ public class PlayListHolder extends RecyclerView.ViewHolder {
     View playlist_view;
     LinearLayout selected_line;
     private PlayListAdapter adapter;
-    public PlayListHolder(@NonNull View itemView) {
+    public PlayListHolder(@NonNull View itemView, PlaylistInterface playlistInterface) {
         super(itemView);
         playlist_name = itemView.findViewById(R.id.playlist_name);
         playlist_menu_btn = itemView.findViewById(R.id.playlist_menu_btn);
         playlist_view = itemView.findViewById(R.id.playlist_view);
         selected_line = itemView.findViewById(R.id.selected_line);
+
+        playlist_menu_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (playlistInterface != null){
+                    int position = getAbsoluteAdapterPosition();
+
+                    if (position != RecyclerView.NO_POSITION){
+                        playlistInterface.onTrashClick(position);
+                    }
+                }
+            }
+        });
     }
 
     public TextView getPlaylist_name() {

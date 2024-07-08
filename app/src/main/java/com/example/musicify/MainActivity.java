@@ -18,14 +18,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.drawable.AnimationDrawable;
-import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -35,8 +32,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.musicify.adapter.PlayListAdapter;
-import com.example.musicify.service.SensorService;
-import com.example.musicify.util.Sensor;
+import com.example.musicify.interfaces.PlaylistInterface;
+import com.example.musicify.util.MusicDatabaseHelper;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
@@ -44,7 +41,7 @@ import com.google.android.exoplayer2.Player;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PlaylistInterface {
 
     public EditText song_text;
     private static final String Tag = "MainActivity";
@@ -59,9 +56,9 @@ public class MainActivity extends AppCompatActivity {
     int repeatMode = 1; //repeat all = 1, repeat one = 2,
     int shuffleMode = 1;
     boolean is_bound = false;
-    boolean is_sensor_service_bound = false;
     boolean is_showing = false;
-    Sensor sensor;
+    PlayListAdapter playListAdapter;
+    ArrayList<Playlists> playlists = new ArrayList<Playlists>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,15 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Background gradient
         ConstraintLayout constraintLayout = findViewById(R.id.main_layout);
-        AnimationDrawable animationDrawable = (AnimationDrawable) constraintLayout.getBackground();
-        animationDrawable.setEnterFadeDuration(2500);
-        animationDrawable.setExitFadeDuration(5000);
-        animationDrawable.start();
 
-        //sensor
-        //sensor = new Sensor(MainActivity.this, (SensorManager) getSystemService(Context.SENSOR_SERVICE), (Vibrator) getSystemService(Context.VIBRATOR_SERVICE));
-
-        //player = new ExoPlayer.Builder(this).build();
         homeSongNameView = findViewById(R.id.homeSongNameView);
         miniPlayer = findViewById(R.id.miniPlayer);
         seekBar = findViewById(R.id.seekbar);
@@ -155,24 +144,6 @@ public class MainActivity extends AppCompatActivity {
         bindService(playerServiceIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
-    public void bindSensor(){
-        Intent sensorServiceIntent = new Intent(this, SensorService.class);
-        bindService(sensorServiceIntent, sensorServiceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    ServiceConnection sensorServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            SensorService.SensorBinder binder = (SensorService.SensorBinder) iBinder;
-            sensor = binder.getSensor().sensor;
-            is_sensor_service_bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            Log.i(Tag, "Service is disconnected");
-        }
-    };
 
     ServiceConnection playerServiceConnection = new ServiceConnection() {
         @Override
@@ -184,8 +155,6 @@ public class MainActivity extends AppCompatActivity {
             requestPermission();
             //ready to show the songs
             playwerControls();
-            //Bind the sensor
-            bindSensor();
         }
 
         @Override
@@ -354,22 +323,18 @@ public class MainActivity extends AppCompatActivity {
         Playlists all_song_playlist = new Playlists(-1,"All Songs");
         all_song_playlist.setSongs(getMusic());
         all_song_playlist.setIs_selected(true);
-        ArrayList<Playlists> playlists = new ArrayList<Playlists>();
         playlists.add(all_song_playlist);
         //To get all the lists from the database
         playlists.addAll(new MusicDatabaseHelper(MainActivity.this).getPlaylists());
         RecyclerView recyclerView = findViewById(R.id.playlist_recylerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        PlayListAdapter playListAdapter = new PlayListAdapter(getApplicationContext(), playlists, player, songRecyclerView);
+        playListAdapter = new PlayListAdapter(getApplicationContext(), playlists, player, songRecyclerView, this);
         recyclerView.setAdapter(playListAdapter);
         //Set the player
-        sensor.setPlayer(player);
+//        sensor.setPlayer(player);
         add_playlist_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                playlists.add(new Playlists(add_playlist_txtbox.getText().toString()));
-//                Toast.makeText(getApplicationContext(), "Successfully created playlist " + add_playlist_txtbox.getText().toString(), Toast.LENGTH_SHORT).show();
-//                playListAdapter.notifyItemInserted(playlists.size()-1);
                 MusicDatabaseHelper musicDatabaseHelper = new MusicDatabaseHelper(MainActivity.this);
                 int id = musicDatabaseHelper.addPlaylist(add_playlist_txtbox.getText().toString());
                 boolean result = false;
@@ -440,10 +405,6 @@ public class MainActivity extends AppCompatActivity {
             unbindService(playerServiceConnection);
             is_bound = false;
         }
-        if (is_sensor_service_bound){
-            unbindService(sensorServiceConnection);
-            is_sensor_service_bound = false;
-        }
 
     }
 
@@ -475,5 +436,14 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
+    }
+
+    @Override
+    public void onTrashClick(int position) {
+        Toast.makeText(this.getApplicationContext(), "Cliked on trash bin", Toast.LENGTH_SHORT).show();
+        MusicDatabaseHelper databaseHelper = new MusicDatabaseHelper(this.getApplicationContext());
+        databaseHelper.delete_playlist(String.valueOf(playlists.get(position).getId()));
+        playlists.remove(position);
+        playListAdapter.notifyItemRemoved(position);
     }
 }

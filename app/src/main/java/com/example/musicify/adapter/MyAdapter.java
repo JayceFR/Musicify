@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.musicify.MusicDatabaseHelper;
+import com.example.musicify.util.MusicDatabaseHelper;
 import com.example.musicify.holder.MyViewHolder;
 import com.example.musicify.PlayerService;
 import com.example.musicify.Playlists;
