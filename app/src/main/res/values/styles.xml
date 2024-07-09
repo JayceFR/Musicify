@@ -9,6 +9,12 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/colorPrimary</item>
-        <item name="android:itemBackground">@color/skyBlue</item>
+        <item name="android:itemBackground">#5827B3</item>
+        <item name="android:theme">@style/Theme.Material3.Dark</item>
+    </style>
+    
+    <style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">#000000</item>
+        <item name="android:textColor">#FFFFFF</item>
     </style>
 </resources>

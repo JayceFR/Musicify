@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.musicify.interfaces.AdapterInterface;
 import com.example.musicify.util.MusicDatabaseHelper;
 import com.example.musicify.holder.PlayListHolder;
 import com.example.musicify.Playlists;
@@ -26,7 +27,7 @@ import java.util.List;
 
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
-public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
+public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> implements AdapterInterface {
     private final PlaylistInterface playlistInterface;
     Context context;
     List<Playlists> playlists;
@@ -34,6 +35,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
     RecyclerView recyclerView;
     MyAdapter songAdapter;
     Boolean onLoad;
+    int curr_playlist_pos = -1;
 
     public PlayListAdapter(Context context, List<Playlists> playlists, ExoPlayer player, RecyclerView recyclerView, PlaylistInterface playlistInterface) {
         this.context = context;
@@ -61,7 +63,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
         if ( onLoad && playlists.get(position).id == -1 && playlists.get(position).getIs_selected()){
             playlists.get(position).setHolder(holder);
             holder.getSelected_line().setBackgroundColor(Color.parseColor("#ffffff"));
-            fetch_songs(context, player, recyclerView, playlists.get(position).getSongs());
+            fetch_songs(context, player, recyclerView, playlists.get(position).getSongs(), position);
             onLoad = false;
         }
         holder.getPlaylist_view().setOnClickListener(new View.OnClickListener() {
@@ -78,7 +80,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
                     if (playlists.get(position).id != -1){
                         update_songs(position);
                     }
-                    fetch_songs(context, player, recyclerView, playlists.get(position).getSongs());
+                    curr_playlist_pos = position;
+                    fetch_songs(context, player, recyclerView, playlists.get(position).getSongs(), position);
 
 
                 }
@@ -108,26 +111,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
         playlists.get(position).setSongs(songs);
     }
 
-    public void delete_playlist(int position){
-        MusicDatabaseHelper databaseHelper = new MusicDatabaseHelper(this.context);
-        boolean success = databaseHelper.delete_playlist(String.valueOf(playlists.get(position).getId()));
-        if (success){
-            Toast.makeText(this.context, "Removed playlist", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            Toast.makeText(this.context, "Failed in removing playlist", Toast.LENGTH_SHORT).show();
-        }
-        playlists = databaseHelper.getPlaylists();
-    }
-
     @Override
     public int getItemCount() {
         return playlists.size();
     }
 
-    public void fetch_songs(Context context, ExoPlayer player, RecyclerView recyclerView, ArrayList<Song> songs){
+    public void fetch_songs(Context context, ExoPlayer player, RecyclerView recyclerView, ArrayList<Song> songs, int position){
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        MyAdapter songAdapter = new MyAdapter(context, songs, player, true);
+        songAdapter = new MyAdapter(context, songs, player, true, playlists.get(position), this);
         ScaleInAnimationAdapter scaleInAnimationAdapter = new ScaleInAnimationAdapter(songAdapter);
         scaleInAnimationAdapter.setDuration(1000);
         scaleInAnimationAdapter.setInterpolator(new OvershootInterpolator());
@@ -135,5 +126,11 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> {
         recyclerView.setAdapter(scaleInAnimationAdapter);
     }
 
-
+    @Override
+    public void onDustBinClicked(int position, int curr_playlist_id) {
+        MusicDatabaseHelper db = new MusicDatabaseHelper(context);
+        db.delete_song(playlists.get(curr_playlist_pos).getSongs().get(position).id, String.valueOf(curr_playlist_id));
+        playlists.get(curr_playlist_pos).getSongs().remove(position);
+        songAdapter.notifyItemRemoved(position);
+    }
 }

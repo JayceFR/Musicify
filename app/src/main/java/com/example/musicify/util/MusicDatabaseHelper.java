@@ -200,6 +200,13 @@ public class MusicDatabaseHelper extends SQLiteOpenHelper {
         return referential_integrity;
     }
 
+    public boolean delete_song(String song_id, String playlist_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TableLinker, LinkerColumnSongID + " = ? AND " + LinkerColumnPlaylistID + " = ?", new String[]{song_id, playlist_id});
+        db.close();
+        return true;
+    }
+
     public ArrayList<Playlists> getPlaylists(){
         ArrayList<Playlists> returnPlaylists = new ArrayList<>();
         String queryString = "SELECT * FROM " + TableName;

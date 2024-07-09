@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.musicify.interfaces.AdapterInterface;
 import com.example.musicify.util.MusicDatabaseHelper;
 import com.example.musicify.holder.MyViewHolder;
 import com.example.musicify.PlayerService;
@@ -35,15 +36,19 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements Pop
     List<Song> songs;
     ExoPlayer player;
     boolean play_list_change;
+    Playlists curr_playlist;
+
+    AdapterInterface adapterInterface;
 
     int current_song_pos = -1;
 
-    public MyAdapter(Context context, List<Song> songs, ExoPlayer player, boolean play_list_change) {
+    public MyAdapter(Context context, List<Song> songs, ExoPlayer player, boolean play_list_change, Playlists curr_playlist, AdapterInterface adapterInterface) {
         this.context = context;
         this.songs = songs;
         this.player = player;
         this.play_list_change = play_list_change;
-
+        this.curr_playlist = curr_playlist;
+        this.adapterInterface = adapterInterface;
     }
 
     @NonNull
@@ -69,9 +74,19 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements Pop
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
-        Toast.makeText(context, menuItem.getTitle().toString(), Toast.LENGTH_SHORT).show();
-        MusicDatabaseHelper databaseHelper = new MusicDatabaseHelper(context);
-        boolean result = databaseHelper.addToPlaylist(menuItem.getTitle().toString(), songs.get(this.current_song_pos).id);
+        if (menuItem.getItemId() == R.id.delete){
+            if (curr_playlist.getId() == 1){
+                Toast.makeText(context, "Permission not granted to delete from internal storage", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                adapterInterface.onDustBinClicked(current_song_pos, curr_playlist.id);
+            }
+        }
+        else{
+            Toast.makeText(context, menuItem.getTitle().toString(), Toast.LENGTH_SHORT).show();
+            MusicDatabaseHelper databaseHelper = new MusicDatabaseHelper(context);
+            boolean result = databaseHelper.addToPlaylist(menuItem.getTitle().toString(), songs.get(this.current_song_pos).id);
+        }
         return false;
     }
 
