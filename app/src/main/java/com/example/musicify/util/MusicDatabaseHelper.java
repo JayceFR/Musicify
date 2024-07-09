@@ -100,19 +100,30 @@ public class MusicDatabaseHelper extends SQLiteOpenHelper {
             id = cursor.getInt(0);
         }
         cursor.close();
-        // Get the count from the linker table
-        String get_order_linker_query = "SELECT COUNT(*) FROM " + TableLinker + " WHERE " + LinkerColumnPlaylistID + " = " + id;
-        Cursor order_cursor = db.rawQuery(get_order_linker_query, null);
-        int order = -1;
-        if (order_cursor.moveToFirst()){
-            order = order_cursor.getInt(0) + 1;
+        //fetch the number of songs in the playlist
+        String fetch_no_songs = "SELECT " + Column_Noofsongs + " FROM " + TableName + " WHERE " + ColumnId + " = " + id;
+        Cursor id_cursor = db.rawQuery(fetch_no_songs, null);
+        int no_of_songs = -1;
+        if (id_cursor.moveToFirst()){
+            no_of_songs = id_cursor.getInt(0);
         }
-        order_cursor.close();
+        id_cursor.close();
+
+        no_of_songs++;
+
         ContentValues cv = new ContentValues();
         cv.put(LinkerColumnSongID, songID);
         cv.put(LinkerColumnPlaylistID, id);
-        cv.put(LinkerColumnOrder, order);
+        cv.put(LinkerColumnOrder, no_of_songs);
         long result = db.insert(TableLinker, null, cv);
+
+        //update the number of songs
+        ContentValues values = new ContentValues();
+        values.put(ColumnId, id);
+        values.put(Column_Name, playlist_name);
+        values.put(Column_Noofsongs, no_of_songs);
+        db.update(TableName, values, "id = ?", new String[]{String.valueOf(id)});
+        db.close();
         return result != -1;
     }
 
@@ -132,6 +143,7 @@ public class MusicDatabaseHelper extends SQLiteOpenHelper {
             }while (cursor.moveToNext());
         }
         cursor.close();
+        db.close();
         return songs;
     }
 
@@ -150,6 +162,7 @@ public class MusicDatabaseHelper extends SQLiteOpenHelper {
                 return new Song(id, title, artist, duration, path);
             }
             cursor.close();
+            db.close();
         }
         return null;
     }
@@ -180,15 +193,11 @@ public class MusicDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         boolean referential_integrity = false;
         //remove the link in the linker for maintaining referential integrity
-        String queryString = "DELETE FROM " + TableLinker + " WHERE " + LinkerColumnPlaylistID + " = " + id;
-        Cursor cursor = db.rawQuery(queryString, null);
-        if (cursor.moveToFirst()) {
-            referential_integrity = true;
-        }
-        //remove the playlist
-        String remove_playlist_query = "DELETE FROM " + TableName + " WHERE " + ColumnId + " = " + id;
-        Cursor cursor1 = db.rawQuery(remove_playlist_query, null);
-        return cursor1.moveToFirst() && referential_integrity;
+        db.delete(TableLinker, LinkerColumnPlaylistID + " = ? ", new String[]{id});
+        //remove the playlist in the playlist table
+        db.delete(TableName, ColumnId + " = ?", new String[]{id});
+        db.close();
+        return referential_integrity;
     }
 
     public ArrayList<Playlists> getPlaylists(){
