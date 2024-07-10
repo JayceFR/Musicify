@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="#000000"
     android:id="@+id/main_layout"
     tools:context=".MainActivity">
+    
+
 
     <TextView
         android:id="@+id/textView2"
@@ -93,6 +95,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
+        android:layout_marginStart="5dp"
         android:layout_height="0dp"
         app:fastScrollEnabled="false"
         app:layout_constraintBottom_toTopOf="@+id/miniPlayer"

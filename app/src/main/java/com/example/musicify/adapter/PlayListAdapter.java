@@ -120,7 +120,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListHolder> implem
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         songAdapter = new MyAdapter(context, songs, player, true, playlists.get(position), this);
         ScaleInAnimationAdapter scaleInAnimationAdapter = new ScaleInAnimationAdapter(songAdapter);
-        scaleInAnimationAdapter.setDuration(1000);
+        scaleInAnimationAdapter.setDuration(400);
         scaleInAnimationAdapter.setInterpolator(new OvershootInterpolator());
         scaleInAnimationAdapter.setFirstOnly(false);
         recyclerView.setAdapter(scaleInAnimationAdapter);
