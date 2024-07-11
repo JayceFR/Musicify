@@ -103,6 +103,22 @@ public class PlayerService extends Service {
             public void onPause() {
                 player.setPlayWhenReady(false);
             }
+
+            @Override
+            public void onSkipToNext() {
+                super.onSkipToNext();
+                if (player.hasNextMediaItem()){
+                    player.seekToNext();
+                }
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                super.onSkipToPrevious();
+                if (player.hasPreviousMediaItem()){
+                    player.seekToPrevious();
+                }
+            }
         });
         PlaybackStateCompat playbackState = new PlaybackStateCompat.Builder().setState(PlaybackStateCompat.STATE_PLAYING, 0, 1.0f).build();
         mediaSession.setPlaybackState(playbackState);

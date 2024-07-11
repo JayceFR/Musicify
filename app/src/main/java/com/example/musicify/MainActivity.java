@@ -37,8 +37,10 @@ import com.example.musicify.util.MusicDatabaseHelper;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.analytics.AnalyticsListener;
 
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements PlaylistInterface {
@@ -165,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistInterface
 
     public void playwerControls(){
         homeSongNameView.setSelected(true);
+
         player.addListener(new Player.Listener() {
             @Override
             public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {

@@ -122,20 +122,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> implements Pop
             player.play();
         });
         holder.getMenu_btn().setOnClickListener(view -> showPopup(view, position));
-//        holder.songView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(!player.isPlaying()){
-//                    player.setMediaItems(getMediaItems(), position, 0);
-//                }
-//                else{
-//                    player.pause();
-//                    player.seekTo(position, 0);
-//                }
-//                player.prepare();
-//                player.play();
-//            }
-//        });
     }
 
     public List<MediaItem> getMediaItems(){
