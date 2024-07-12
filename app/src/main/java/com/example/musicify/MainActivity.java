@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistInterface
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Theme_Musicify);
         setContentView(R.layout.activity_main);
 
         //Background gradient
